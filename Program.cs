@@ -130,8 +130,7 @@ namespace Tracking
 
         static void Main(string[] args)
         {
-            // Ok, go find me a connection string.
-            using (var cx = new SqlConnection("Connection string goes here"))
+            using (var cx = new SqlConnection(ReadConnectionString()))
             using (var tx = cx.BeginTransaction())
             {
                 var generator = new Generator();
@@ -169,6 +168,14 @@ namespace Tracking
                     serializedChanges = JsonConvert.SerializeObject(update),
                 }
             );
+        }
+
+        /// <summary>
+        /// Try running cat file-containing-connection-string | dotnet run
+        /// </summary>
+        static string ReadConnectionString()
+        {
+            return Console.In.ReadToEnd();
         }
     }
 }
