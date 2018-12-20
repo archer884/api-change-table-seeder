@@ -131,23 +131,29 @@ namespace Tracking
         static void Main(string[] args)
         {
             using (var cx = new SqlConnection(ReadConnectionString()))
-            using (var tx = cx.BeginTransaction())
             {
-                var generator = new Generator();
+                cx.Open();
 
-                for (var i = 0; i < 300; ++i)
+                using (var tx = cx.BeginTransaction())
                 {
-                    var employeeUpdate = generator.EmployeeUpdate();
-                    if (employeeUpdate.PropertyChanges.Any())
+                    var generator = new Generator();
+
+                    for (var i = 0; i < 300; ++i)
                     {
-                        cx.Execute(CreateInsertCommand(tx, employeeUpdate));
+                        var employeeUpdate = generator.EmployeeUpdate();
+                        if (employeeUpdate.PropertyChanges.Any())
+                        {
+                            cx.Execute(CreateInsertCommand(tx, employeeUpdate));
+                        }
+
+                        var projectUpdate = generator.ProjectUpdate();
+                        if (employeeUpdate.PropertyChanges.Any())
+                        {
+                            cx.Execute(CreateInsertCommand(tx, projectUpdate));
+                        }
                     }
 
-                    var projectUpdate = generator.ProjectUpdate();
-                    if (employeeUpdate.PropertyChanges.Any())
-                    {
-                        cx.Execute(CreateInsertCommand(tx, projectUpdate));
-                    }
+                    tx.Commit();
                 }
             }
         }
@@ -171,7 +177,8 @@ namespace Tracking
         }
 
         /// <summary>
-        /// Try running cat file-containing-connection-string | dotnet run
+        /// Try running the following commaand:
+        /// cat connection-string.txt | dotnet run
         /// </summary>
         static string ReadConnectionString()
         {
