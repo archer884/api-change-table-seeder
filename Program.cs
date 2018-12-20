@@ -171,7 +171,7 @@ namespace Tracking
                     apiType = update.Api,
                     matterNumber = update.MatterNumber,
                     timestamp = update.Timestamp,
-                    serializedChanges = JsonConvert.SerializeObject(update),
+                    serializedChanges = JsonConvert.SerializeObject(update.PropertyChanges),
                 }
             );
         }
